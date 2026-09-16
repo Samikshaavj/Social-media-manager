@@ -37,6 +37,16 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 404 Handler for API routes
+app.use('/api/debug/uploads', (req, res) => {
+  try {
+    const fs = require('fs');
+    const files = fs.readdirSync(path.join(__dirname, '../uploads'));
+    res.json({ __dirname, files });
+  } catch(e) {
+    res.json({ error: e.message, __dirname });
+  }
+});
+
 app.use('/api', (req, res, next) => {
   res.status(404).json({ error: 'Not Found' });
 });
