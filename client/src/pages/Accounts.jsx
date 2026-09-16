@@ -22,7 +22,7 @@ const Accounts = () => {
   }, []);
 
   const handleConnect = (platformName) => {
-    if (platformName === 'instagram' || platformName === 'facebook') {
+    if (platformName === 'instagram' || platformName === 'facebook' || platformName === 'linkedin') {
       setActiveModalPlatform(platformName);
     } else {
       proceedWithConnect(platformName);
@@ -93,8 +93,10 @@ const Accounts = () => {
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               {activeModalPlatform === 'instagram' ? (
                 <><ImageIcon className="text-pink-500" size={24} /> Connect Instagram</>
-              ) : (
+              ) : activeModalPlatform === 'facebook' ? (
                 <><MessageCircle className="text-blue-500" size={24} /> Connect Facebook</>
+              ) : (
+                <><Briefcase className="text-blue-400" size={24} /> Connect LinkedIn</>
               )}
             </h2>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
@@ -102,14 +104,18 @@ const Accounts = () => {
                 <strong>Important Requirement:</strong> 
                 {activeModalPlatform === 'instagram' 
                   ? " To post and view analytics, the Instagram API requires that you connect a Professional Account (Business or Creator) that is linked to a Facebook Page."
-                  : " Facebook's API rules state that third-party apps can only post to Facebook Pages, not personal Facebook profiles. Please ensure you select a Facebook Page to connect."
+                  : activeModalPlatform === 'facebook'
+                  ? " Facebook's API rules state that third-party apps can only post to Facebook Pages, not personal Facebook profiles. Please ensure you select a Facebook Page to connect."
+                  : " LinkedIn requires you to grant authorization to post to your personal profile. You will be redirected to LinkedIn to approve these permissions."
                 }
               </p>
             </div>
             <p className="text-gray-400 text-sm mb-6">
               {activeModalPlatform === 'instagram'
                 ? "You will be redirected to Facebook to authorize the connection. Please ensure you log into the Facebook account that manages your Instagram's linked Page."
-                : "You will be redirected to Facebook to authorize the connection. Please grant the requested permissions for the Page you want to manage."
+                : activeModalPlatform === 'facebook'
+                ? "You will be redirected to Facebook to authorize the connection. Please grant the requested permissions for the Page you want to manage."
+                : "You will be redirected to LinkedIn to authorize the connection."
               }
             </p>
             <div className="flex gap-3 justify-end">
@@ -128,10 +134,12 @@ const Accounts = () => {
                 className={`px-5 py-2 rounded-xl font-medium shadow-lg transition-all text-white ${
                   activeModalPlatform === 'instagram' 
                     ? 'bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500'
-                    : 'bg-blue-600 hover:bg-blue-700'
+                    : activeModalPlatform === 'facebook'
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-blue-500 hover:bg-blue-600' // LinkedIn styling
                 }`}
               >
-                Proceed to Facebook
+                Proceed to {activeModalPlatform === 'instagram' || activeModalPlatform === 'facebook' ? 'Facebook' : 'LinkedIn'}
               </button>
             </div>
           </div>
