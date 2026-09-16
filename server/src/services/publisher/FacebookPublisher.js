@@ -25,9 +25,18 @@ class FacebookPublisher extends PublisherStrategy {
     }
 
     // Resolve public URL for Facebook to download
-    // Since we use FACEBOOK_REDIRECT_URI, we can extract the base URL from it
-    const redirectUri = process.env.FACEBOOK_REDIRECT_URI || (process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace('5173', '5000') + '/api/oauth/callback/facebook' : 'http://localhost:5000/api/oauth/callback/facebook');
-    const baseUrl = redirectUri.replace(/\/api\/oauth\/callback\/facebook$/, '');
+    let baseUrl = 'http://localhost:5000';
+    if (process.env.NODE_ENV === 'production') {
+      baseUrl = process.env.FACEBOOK_REDIRECT_URI ? new URL(process.env.FACEBOOK_REDIRECT_URI).origin : 'https://social-media-manager-nld2.onrender.com';
+    } else {
+      if (process.env.FACEBOOK_REDIRECT_URI) {
+        baseUrl = process.env.FACEBOOK_REDIRECT_URI.replace(/\/api\/oauth\/callback\/facebook$/, '');
+      } else if (process.env.INSTAGRAM_REDIRECT_URI) {
+        baseUrl = process.env.INSTAGRAM_REDIRECT_URI.replace(/\/api\/oauth\/callback\/instagram$/, '');
+      } else if (process.env.NGROK_URL) {
+        baseUrl = process.env.NGROK_URL;
+      }
+    }
     const mediaUrl = `${baseUrl}${asset.url}`;
 
     try {

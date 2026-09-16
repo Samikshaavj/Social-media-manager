@@ -25,8 +25,18 @@ class InstagramPublisher extends PublisherStrategy {
     }
 
     // The asset URL is currently a local path (e.g., /uploads/filename.jpg)
-    // We need to resolve this to the public ngrok URL so Facebook can download it.
-    const baseUrl = process.env.INSTAGRAM_REDIRECT_URI.replace(/\/api\/oauth\/callback\/instagram$/, '');
+    let baseUrl = 'http://localhost:5000';
+    if (process.env.NODE_ENV === 'production') {
+      baseUrl = process.env.INSTAGRAM_REDIRECT_URI ? new URL(process.env.INSTAGRAM_REDIRECT_URI).origin : 'https://social-media-manager-nld2.onrender.com';
+    } else {
+      if (process.env.INSTAGRAM_REDIRECT_URI) {
+        baseUrl = process.env.INSTAGRAM_REDIRECT_URI.replace(/\/api\/oauth\/callback\/instagram$/, '');
+      } else if (process.env.FACEBOOK_REDIRECT_URI) {
+        baseUrl = process.env.FACEBOOK_REDIRECT_URI.replace(/\/api\/oauth\/callback\/facebook$/, '');
+      } else if (process.env.NGROK_URL) {
+        baseUrl = process.env.NGROK_URL;
+      }
+    }
     const mediaUrl = `${baseUrl}${asset.url}`;
 
     try {
