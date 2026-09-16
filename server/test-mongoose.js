@@ -1,0 +1,1 @@
+const mongoose = require('mongoose'); require('dotenv').config(); mongoose.set('debug', true); mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 5000 }).then(() => { console.log('Success'); process.exit(0); }).catch(err => { console.error('Error:', err.message); process.exit(1); })
