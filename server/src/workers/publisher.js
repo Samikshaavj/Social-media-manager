@@ -60,7 +60,7 @@ const initPublisherWorker = () => {
           } catch (error) {
             console.error(`[WORKER] Failed to publish to ${pub.platform}:`, error.message);
             pub.status = 'FAILED';
-            pub.errorDetails = error.message;
+            pub.errorDetails = error.response?.data ? JSON.stringify(error.response.data) : error.message;
             await pub.save();
             allSuccess = false;
           }
