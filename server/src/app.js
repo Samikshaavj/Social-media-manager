@@ -45,7 +45,8 @@ app.use('/api', (req, res, next) => {
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-  app.get('*', (req, res) => {
+  // Use regex for catch-all to avoid Express 5 path-to-regexp '*' error
+  app.get(/(.*)/, (req, res) => {
     res.sendFile(path.resolve(__dirname, '../../client/dist', 'index.html'));
   });
 } else {
