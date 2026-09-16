@@ -41,8 +41,8 @@ const Accounts = () => {
 
   const proceedWithConnect = (platformName) => {
     const token = localStorage.getItem('social_vibe_token');
-    const baseUrl = import.meta.env.PROD ? window.location.origin : 'http://localhost:5000';
-    window.location.href = `${baseUrl}/api/oauth/connect/${platformName}?token=${token}`;
+    // Using a relative URL ensures it works on both localhost (via Vite proxy) and Render production
+    window.location.href = `/api/oauth/connect/${platformName}?token=${token}`;
   };
 
   const platforms = [
