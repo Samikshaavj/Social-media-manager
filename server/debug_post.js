@@ -9,18 +9,30 @@ async function run() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('Connected to MongoDB');
 
-  // Find recent publications
-  const pub = await Publication.findOne({ platform: 'Instagram' }).sort({ createdAt: -1 });
-  if (!pub) return console.log('No pub');
+  // Find failed Facebook publication
+  const pub = await Publication.findOne({ platform: 'Facebook', status: 'FAILED' }).sort({ createdAt: -1 });
+  if (!pub) return console.log('No failed Facebook pub found.');
   
+  const post = await Post.findById(pub.postId);
   const account = await SocialAccount.findById(pub.socialAccountId);
   
+  const FacebookPublisher = require('./src/services/publisher/FacebookPublisher');
+  
+  // Set the environment variable to Render just for this script
+  process.env.FACEBOOK_REDIRECT_URI = 'https://social-media-manager-nld2.onrender.com/api/oauth/callback/facebook';
+  
+  const publisher = new FacebookPublisher();
+  
   try {
-    const axios = require('axios');
-    const res = await axios.get(`https://graph.facebook.com/v20.0/${pub.externalPostId}?fields=id,media_product_type,media_type,permalink,shortcode&access_token=${account.accessToken}`);
-    console.log('Facebook API response:', JSON.stringify(res.data, null, 2));
-  } catch(e) {
-    console.error('FB API error:', e.response?.data || e.message);
+    console.log('Trying to re-publish...');
+    const result = await publisher.publish(pub, post.content, post.globalMedia, account.accessToken);
+    console.log('Success!', result);
+  } catch (error) {
+    console.error('Publishing failed:');
+    console.error(error.message);
+    if (error.response && error.response.data) {
+      console.error(JSON.stringify(error.response.data, null, 2));
+    }
   }
   
   return;

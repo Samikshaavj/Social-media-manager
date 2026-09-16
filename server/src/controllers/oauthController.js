@@ -85,8 +85,27 @@ const getConnectedAccounts = async (req, res, next) => {
   }
 };
 
+// @desc    Disconnect an account
+// @route   DELETE /api/oauth/disconnect/:platform
+// @access  Private
+const disconnectPlatform = async (req, res, next) => {
+  try {
+    const { platform } = req.params;
+    
+    await SocialAccount.findOneAndDelete({ 
+      userId: req.user.id, 
+      platform: platform.toLowerCase() 
+    });
+    
+    res.json({ success: true, message: `Disconnected ${platform}` });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   connectPlatform,
   oauthCallback,
   getConnectedAccounts,
+  disconnectPlatform,
 };

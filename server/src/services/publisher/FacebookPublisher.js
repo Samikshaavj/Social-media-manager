@@ -32,7 +32,7 @@ class FacebookPublisher extends PublisherStrategy {
 
     try {
       let endpoint = `https://graph.facebook.com/v20.0/${pageId}/photos`;
-      let params = {
+      let body = {
         message: postContent,
         access_token: accessToken,
         url: mediaUrl
@@ -40,7 +40,7 @@ class FacebookPublisher extends PublisherStrategy {
 
       if (asset.type === 'VIDEO') {
         endpoint = `https://graph.facebook.com/v20.0/${pageId}/videos`;
-        params = {
+        body = {
           description: postContent, // Videos use 'description' instead of 'message'
           access_token: accessToken,
           file_url: mediaUrl // Videos use 'file_url'
@@ -52,7 +52,7 @@ class FacebookPublisher extends PublisherStrategy {
       console.log('mediaUrl:', mediaUrl);
       console.log('---------------------');
 
-      const response = await axios.post(endpoint, null, { params });
+      const response = await axios.post(endpoint, body);
 
       if (!response.data.id) {
         throw new Error('Failed to publish to Facebook Page.');

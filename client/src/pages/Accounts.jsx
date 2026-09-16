@@ -29,6 +29,16 @@ const Accounts = () => {
     }
   };
 
+  const handleDisconnect = async (platformName) => {
+    try {
+      await api.delete(`/oauth/disconnect/${platformName}`);
+      setConnectedPlatforms(prev => prev.filter(p => p !== platformName));
+    } catch (error) {
+      console.error('Failed to disconnect:', error);
+      alert('Failed to disconnect account');
+    }
+  };
+
   const proceedWithConnect = (platformName) => {
     const token = localStorage.getItem('social_vibe_token');
     window.location.href = `http://localhost:5000/api/oauth/connect/${platformName}?token=${token}`;
@@ -62,15 +72,15 @@ const Accounts = () => {
                 {isConnected ? <span className="text-green-400 flex items-center gap-1 justify-center"><CheckCircle2 size={14}/> Connected</span> : 'Not connected'}
               </p>
               <button 
-                onClick={() => !isConnected && handleConnect(platform.id)}
-                disabled={isConnected || loading}
+                onClick={() => isConnected ? handleDisconnect(platform.id) : handleConnect(platform.id)}
+                disabled={loading}
                 className={`w-full py-2.5 rounded-xl font-medium transition-colors ${
                   isConnected 
-                    ? 'bg-[#1a1a24] text-gray-500 border border-[#2d2d3f] cursor-default' 
+                    ? 'bg-[#1a1a24] text-red-400 border border-red-500/30 hover:bg-red-500/10' 
                     : 'bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20'
                 }`}
               >
-                {isConnected ? 'Manage' : `Connect ${platform.name}`}
+                {isConnected ? 'Disconnect' : `Connect ${platform.name}`}
               </button>
             </div>
           );
