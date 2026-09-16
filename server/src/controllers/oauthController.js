@@ -94,7 +94,7 @@ const disconnectPlatform = async (req, res, next) => {
     
     await SocialAccount.findOneAndDelete({ 
       userId: req.user.id, 
-      platform: platform.toLowerCase() 
+      platform: new RegExp(`^${platform}$`, 'i')
     });
     
     res.json({ success: true, message: `Disconnected ${platform}` });
