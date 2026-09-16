@@ -1,5 +1,6 @@
 const MockPlatformStrategy = require('./MockStrategy');
 const InstagramStrategy = require('./InstagramStrategy');
+const FacebookStrategy = require('./FacebookStrategy');
 
 class OAuthFactory {
   static getStrategy(platform) {
@@ -7,6 +8,7 @@ class OAuthFactory {
       case 'instagram':
         return new InstagramStrategy();
       case 'facebook':
+        return new FacebookStrategy();
       case 'linkedin':
       case 'youtube':
       case 'pinterest':

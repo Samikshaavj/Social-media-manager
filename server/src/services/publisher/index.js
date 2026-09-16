@@ -1,11 +1,14 @@
 const MockPublisher = require('./MockPublisher');
+const InstagramPublisher = require('./InstagramPublisher');
+const FacebookPublisher = require('./FacebookPublisher');
 
 class PublisherFactory {
   static getPublisher(platform) {
     switch (platform.toLowerCase()) {
       case 'instagram':
-        return new (require('./InstagramPublisher'))();
+        return new InstagramPublisher();
       case 'facebook':
+        return new FacebookPublisher();
       case 'linkedin':
       case 'youtube':
       case 'pinterest':

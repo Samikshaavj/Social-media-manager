@@ -9,22 +9,21 @@ async function run() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('Connected to MongoDB');
 
-  // Find the latest failed publication
-  const pub = await Publication.findOne({ platform: 'Instagram', status: 'FAILED' }).sort({ createdAt: -1 });
-  if (!pub) {
-    console.log('No failed publication found.');
-    return;
+  // Find recent publications
+  const pub = await Publication.findOne({ platform: 'Instagram' }).sort({ createdAt: -1 });
+  if (!pub) return console.log('No pub');
+  
+  const account = await SocialAccount.findById(pub.socialAccountId);
+  
+  try {
+    const axios = require('axios');
+    const res = await axios.get(`https://graph.facebook.com/v20.0/${pub.externalPostId}?fields=id,media_product_type,media_type,permalink,shortcode&access_token=${account.accessToken}`);
+    console.log('Facebook API response:', JSON.stringify(res.data, null, 2));
+  } catch(e) {
+    console.error('FB API error:', e.response?.data || e.message);
   }
   
-  const post = await Post.findById(pub.postId);
-  const account = await SocialAccount.findOne({ userId: post.userId, platform: 'instagram' });
-  
-  if (!account) {
-    console.log('Account not found');
-    return;
-  }
-
-  const publisher = new InstagramPublisher();
+  return;
   
   try {
     console.log('Attempting to publish post:', post._id);

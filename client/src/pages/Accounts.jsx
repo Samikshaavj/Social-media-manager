@@ -5,7 +5,7 @@ import api from '../api/axios';
 const Accounts = () => {
   const [connectedPlatforms, setConnectedPlatforms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showInstagramWarning, setShowInstagramWarning] = useState(false);
+  const [activeModalPlatform, setActiveModalPlatform] = useState(null);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -22,8 +22,8 @@ const Accounts = () => {
   }, []);
 
   const handleConnect = (platformName) => {
-    if (platformName === 'instagram') {
-      setShowInstagramWarning(true);
+    if (platformName === 'instagram' || platformName === 'facebook') {
+      setActiveModalPlatform(platformName);
     } else {
       proceedWithConnect(platformName);
     }
@@ -77,31 +77,49 @@ const Accounts = () => {
         })}
       </div>
 
-      {showInstagramWarning && (
+      {activeModalPlatform && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#111116] border border-[#2d2d3f] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <ImageIcon className="text-pink-500" size={24} />
-              Connect Instagram
+              {activeModalPlatform === 'instagram' ? (
+                <><ImageIcon className="text-pink-500" size={24} /> Connect Instagram</>
+              ) : (
+                <><MessageCircle className="text-blue-500" size={24} /> Connect Facebook</>
+              )}
             </h2>
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
               <p className="text-yellow-200/90 text-sm leading-relaxed">
-                <strong>Important Requirement:</strong> To post and view analytics, the Instagram API requires that you connect a <strong>Professional Account (Business or Creator)</strong> that is linked to a <strong>Facebook Page</strong>.
+                <strong>Important Requirement:</strong> 
+                {activeModalPlatform === 'instagram' 
+                  ? " To post and view analytics, the Instagram API requires that you connect a Professional Account (Business or Creator) that is linked to a Facebook Page."
+                  : " Facebook's API rules state that third-party apps can only post to Facebook Pages, not personal Facebook profiles. Please ensure you select a Facebook Page to connect."
+                }
               </p>
             </div>
             <p className="text-gray-400 text-sm mb-6">
-              You will be redirected to Facebook to authorize the connection. Please ensure you log into the Facebook account that manages your Instagram's linked Page.
+              {activeModalPlatform === 'instagram'
+                ? "You will be redirected to Facebook to authorize the connection. Please ensure you log into the Facebook account that manages your Instagram's linked Page."
+                : "You will be redirected to Facebook to authorize the connection. Please grant the requested permissions for the Page you want to manage."
+              }
             </p>
             <div className="flex gap-3 justify-end">
               <button 
-                onClick={() => setShowInstagramWarning(false)}
+                onClick={() => setActiveModalPlatform(null)}
                 className="px-5 py-2 rounded-xl font-medium text-gray-400 hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button 
-                onClick={() => proceedWithConnect('instagram')}
-                className="bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500 text-white px-5 py-2 rounded-xl font-medium shadow-lg transition-all"
+                onClick={() => {
+                  const platform = activeModalPlatform;
+                  setActiveModalPlatform(null);
+                  proceedWithConnect(platform);
+                }}
+                className={`px-5 py-2 rounded-xl font-medium shadow-lg transition-all text-white ${
+                  activeModalPlatform === 'instagram' 
+                    ? 'bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
               >
                 Proceed to Facebook
               </button>
