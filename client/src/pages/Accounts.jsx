@@ -41,7 +41,8 @@ const Accounts = () => {
 
   const proceedWithConnect = (platformName) => {
     const token = localStorage.getItem('social_vibe_token');
-    window.location.href = `http://localhost:5000/api/oauth/connect/${platformName}?token=${token}`;
+    const baseUrl = import.meta.env.PROD ? window.location.origin : 'http://localhost:5000';
+    window.location.href = `${baseUrl}/api/oauth/connect/${platformName}?token=${token}`;
   };
 
   const platforms = [
