@@ -3,6 +3,7 @@ const InstagramPublisher = require('./InstagramPublisher');
 const FacebookPublisher = require('./FacebookPublisher');
 const LinkedInPublisher = require('./LinkedInPublisher');
 const PinterestPublisher = require('./PinterestPublisher');
+const YouTubePublisher = require('./YouTubePublisher');
 
 class PublisherFactory {
   static getPublisher(platform) {
@@ -16,10 +17,10 @@ class PublisherFactory {
       case 'pinterest':
         return new PinterestPublisher();
       case 'youtube':
+        return new YouTubePublisher();
+      default:
         // For development, return mock publisher for all unsupported platforms
         return new MockPublisher(platform);
-      default:
-        throw new Error(`Platform ${platform} is not supported for publishing.`);
     }
   }
 }

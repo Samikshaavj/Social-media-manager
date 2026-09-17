@@ -3,6 +3,7 @@ const InstagramStrategy = require('./InstagramStrategy');
 const FacebookStrategy = require('./FacebookStrategy');
 const LinkedInStrategy = require('./LinkedInStrategy');
 const PinterestStrategy = require('./PinterestStrategy');
+const YouTubeStrategy = require('./YouTubeStrategy');
 
 class OAuthFactory {
   static getStrategy(platform) {
@@ -16,10 +17,10 @@ class OAuthFactory {
       case 'pinterest':
         return new PinterestStrategy();
       case 'youtube':
+        return new YouTubeStrategy();
+      default:
         // For development, we return the mock strategy for all unsupported platforms
         return new MockPlatformStrategy(platform);
-      default:
-        throw new Error(`Platform ${platform} is not supported.`);
     }
   }
 }
