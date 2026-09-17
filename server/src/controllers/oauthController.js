@@ -92,7 +92,7 @@ const disconnectPlatform = async (req, res, next) => {
   try {
     const { platform } = req.params;
     
-    await SocialAccount.findOneAndDelete({ 
+    await SocialAccount.deleteMany({ 
       userId: req.user.id, 
       platform: new RegExp(`^${platform}$`, 'i')
     });
