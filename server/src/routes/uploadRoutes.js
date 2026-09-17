@@ -13,7 +13,8 @@ router.post('/', protect, upload.single('media'), async (req, res, next) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const isVideo = req.file.mimetype.startsWith('video/');
+    const ext = req.file.filename.toLowerCase();
+    const isVideo = req.file.mimetype.startsWith('video/') || ext.endsWith('.mp4') || ext.endsWith('.mov');
 
     const mediaAsset = await MediaAsset.create({
       userId: req.user.id,

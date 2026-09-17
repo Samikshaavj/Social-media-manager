@@ -16,19 +16,23 @@ class YouTubePublisher extends PublisherStrategy {
       throw new Error('Could not find connected YouTube account details.');
     }
 
-    const mediaId = mediaAssets[0];
-    const asset = await MediaAsset.findById(mediaId);
-    if (!asset) {
-      throw new Error('Media asset not found in database.');
+    let videoAsset = null;
+    for (const mediaId of mediaAssets) {
+      const asset = await MediaAsset.findById(mediaId);
+      // Fallback check for .mp4 in case DB type is wrong
+      if (asset && (asset.type === 'VIDEO' || asset.url.toLowerCase().endsWith('.mp4') || asset.url.toLowerCase().endsWith('.mov'))) {
+        videoAsset = asset;
+        break;
+      }
     }
-    
-    if (asset.type !== 'VIDEO') {
+
+    if (!videoAsset) {
       throw new Error('YouTube only accepts video uploads. Image uploads are not supported.');
     }
 
     // Determine the absolute local path to the video file
     // The asset.url is typically like '/uploads/filename.mp4'
-    const fileName = path.basename(asset.url);
+    const fileName = path.basename(videoAsset.url);
     const filePath = path.join(__dirname, '../../../uploads', fileName);
 
     if (!fs.existsSync(filePath)) {
