@@ -159,9 +159,9 @@ const ComposerModal = () => {
                 <>
                   <ImageIcon size={32} className="mb-2" />
                   <p className="text-sm font-medium">Drag & drop media here, or click to browse</p>
-                  <p className={`text-xs mt-1 ${selectedPlatforms.includes('YouTube') ? 'text-red-400 font-medium' : 'opacity-60'}`}>
+                  <p className={`text-xs mt-1 ${selectedPlatforms.includes('YouTube') ? 'text-indigo-400 font-medium' : 'opacity-60'}`}>
                     {selectedPlatforms.includes('YouTube') 
-                      ? '* YouTube strictly requires an MP4 video file' 
+                      ? 'Supports only MP4' 
                       : 'Supports JPG, PNG, MP4'}
                   </p>
                 </>
