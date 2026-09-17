@@ -1,30 +1,43 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const PublisherStrategy = require('./PublisherStrategy');
+const SocialAccount = require('../../models/SocialAccount');
+const MediaAsset = require('../../models/MediaAsset');
 
-class LinkedInPublisher {
+class LinkedInPublisher extends PublisherStrategy {
   constructor() {
+    super();
     this.baseUrl = 'http://localhost:5000';
     if (process.env.NODE_ENV === 'production') {
       this.baseUrl = 'https://social-media-manager-nld2.onrender.com';
     }
   }
 
-  async publish(publication, account, asset = null) {
+  async publish(publication, postContent, mediaAssets, accessToken) {
     try {
-      const accessToken = account.accessToken;
+      const account = await SocialAccount.findById(publication.socialAccountId);
+      if (!account || !account.externalAccountId) {
+        throw new Error('Could not find connected LinkedIn account details.');
+      }
       const author = account.externalAccountId; // This is the URN urn:li:person:ID
       
       let specificContent = {
         'com.linkedin.ugc.ShareContent': {
           shareCommentary: {
-            text: publication.content
+            text: postContent
           },
           shareMediaCategory: 'NONE'
         }
       };
 
-      if (asset) {
+      if (mediaAssets && mediaAssets.length > 0) {
+        const assetId = mediaAssets[0];
+        const asset = await MediaAsset.findById(assetId);
+        if (!asset) {
+          throw new Error('Media asset not found in database.');
+        }
+
         // LinkedIn requires 3 steps for media:
         // 1. Register Upload
         // 2. Upload the file
@@ -62,14 +75,12 @@ class LinkedInPublisher {
         const assetUrn = registerResponse.data.value.asset;
 
         // 2. Upload file
-        // Wait, since we have the local file path, we can upload it directly.
-        const filePath = path.join(__dirname, '../../../', asset.url); // asset.url is like '/uploads/uuid.png'
+        const filePath = path.join(__dirname, '../../../', asset.url);
         const fileData = fs.readFileSync(filePath);
         
         await axios.put(uploadUrl, fileData, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
-            // We should let axios or the backend figure out the content type, or just send octet-stream
             'Content-Type': 'application/octet-stream' 
           }
         });
@@ -79,7 +90,7 @@ class LinkedInPublisher {
         specificContent['com.linkedin.ugc.ShareContent'].media = [
           {
             status: 'READY',
-            description: { text: publication.content }, // optional description
+            description: { text: postContent }, 
             media: assetUrn,
             title: { text: 'Upload' }
           }
@@ -104,7 +115,7 @@ class LinkedInPublisher {
       });
 
       return {
-        id: response.data.id,
+        externalPostId: response.data.id,
         url: `https://www.linkedin.com/feed/update/${response.data.id}`
       };
 
