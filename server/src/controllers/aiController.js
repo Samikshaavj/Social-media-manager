@@ -17,7 +17,7 @@ const generateCaption = async (req, res) => {
     const systemInstruction = 'You are a social media expert. Write an engaging social media post caption based on the user prompt. Keep it concise, engaging, and include a few relevant hashtags.';
     
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       contents: prompt,
       config: {
         systemInstruction,
