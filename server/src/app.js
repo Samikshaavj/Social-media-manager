@@ -6,6 +6,7 @@ const postRoutes = require('./routes/postRoutes');
 const oauthRoutes = require('./routes/oauthRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const helmet = require('helmet');
 const path = require('path');
 
@@ -32,6 +33,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/oauth', oauthRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

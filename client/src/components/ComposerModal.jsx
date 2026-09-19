@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useComposer } from '../context/ComposerContext';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
-import { X, Image as ImageIcon, Video, MessageCircle, Briefcase, Bookmark, Calendar, Send } from 'lucide-react';
+import { X, Image as ImageIcon, Video, MessageCircle, Briefcase, Bookmark, Calendar, Send, Sparkles } from 'lucide-react';
 
 const platformsList = [
   { id: 'Instagram', icon: <ImageIcon size={20} />, color: 'hover:text-pink-500 hover:border-pink-500 hover:bg-pink-500/10' },
@@ -20,8 +20,28 @@ const ComposerModal = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
   if (!isComposerOpen) return null;
+
+  const handleAIWrite = async () => {
+    if (!content.trim()) {
+      toast.error('Please write a few words first to guide the AI.');
+      return;
+    }
+    
+    try {
+      setIsGeneratingAI(true);
+      const { data } = await api.post('/ai/generate-caption', { prompt: content });
+      setContent(data.caption);
+      toast.success('AI caption generated!');
+    } catch (error) {
+      console.error('Failed to generate caption:', error);
+      toast.error('Failed to generate caption with AI.');
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
 
   const togglePlatform = (platformId) => {
     setSelectedPlatforms(prev => 
@@ -121,12 +141,22 @@ const ComposerModal = () => {
 
           {/* Text Editor */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">Post Content</label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-medium text-gray-400">Post Content</label>
+              <button 
+                onClick={handleAIWrite}
+                disabled={isGeneratingAI || !content.trim()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Sparkles size={14} />
+                {isGeneratingAI ? 'Generating...' : 'AI Write'}
+              </button>
+            </div>
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="w-full h-40 bg-[#1a1a24] border border-[#2d2d3f] rounded-xl p-4 text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
-              placeholder="What do you want to share with your audience?"
+              placeholder="What do you want to share with your audience? Write a short prompt and click 'AI Write' to generate a full caption."
             />
           </div>
 
