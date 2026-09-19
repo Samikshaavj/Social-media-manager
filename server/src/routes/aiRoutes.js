@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { generateCaption } = require('../controllers/aiController');
-const auth = require('../middleware/auth'); // assuming we want it protected
+const { protect } = require('../middleware/auth');
 
-router.post('/generate-caption', auth, generateCaption);
+router.post('/generate-caption', protect, generateCaption);
 
 module.exports = router;
