@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Clock, Check, Calendar as CalendarIcon } from 'lucide-react';
+import { Sparkles, Sun, Moon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
 import { useComposer } from '../context/ComposerContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { openComposer, refreshTrigger, triggerRefresh } = useComposer();
+  const { isDark, toggleTheme } = useTheme();
 
   // Day selector state (M, T, W, T, F, S, S)
   const days = [
@@ -130,7 +132,6 @@ const Dashboard = () => {
 
     try {
       setIsScheduling(true);
-      // Calculate next Friday 7:00 pm or next day 7:00 pm
       const nextDate = new Date();
       nextDate.setDate(nextDate.getDate() + ((5 + 7 - nextDate.getDay()) % 7 || 7));
       nextDate.setHours(19, 0, 0, 0);
@@ -152,7 +153,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Schedule error:', error);
       toast.success('Post scheduled for Friday, 7:00 pm!');
-      // Optimistically update Up next
       setPosts(prev => [
         {
           id: Date.now().toString(),
@@ -170,11 +170,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="max-w-[1240px] mx-auto text-[#121028] space-y-9">
+    <div className="max-w-[1240px] mx-auto text-[#121028] dark:text-gray-100 space-y-9 transition-colors">
       {/* Top Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-black text-[#121028] tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-black text-[#121028] dark:text-white tracking-tight mb-4">
             This week
           </h1>
           {/* Day of Week Selector: M, T, W, T, F, S, S */}
@@ -187,8 +187,8 @@ const Dashboard = () => {
                   onClick={() => setSelectedDayIndex(idx)}
                   className={`w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-xs transition-all cursor-pointer ${
                     day.active || isSelected
-                      ? 'bg-[#121028] text-white shadow-sm'
-                      : 'border-2 border-[#121028] bg-transparent text-[#121028] hover:bg-black/5'
+                      ? 'bg-[#121028] dark:bg-[#5835F5] text-white shadow-sm'
+                      : 'border-2 border-[#121028] dark:border-gray-600 bg-transparent text-[#121028] dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                   title={day.name}
                 >
@@ -199,32 +199,44 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* New post Action Button */}
-        <button
-          onClick={() => openComposer()}
-          className="bg-[#121028] hover:bg-black text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md self-start sm:self-auto hover:scale-105 active:scale-95"
-        >
-          New post
-        </button>
+        {/* Top Right Actions: Theme Toggle & New post */}
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          {/* Theme Quick Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#181630] text-[#121028] dark:text-yellow-400 flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+            title={`Switch to ${isDark ? 'Light' : 'Night'} Mode`}
+          >
+            {isDark ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+
+          {/* New post Action Button */}
+          <button
+            onClick={() => openComposer()}
+            className="bg-[#121028] hover:bg-black dark:bg-white dark:text-[#121028] dark:hover:bg-gray-100 text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+          >
+            New post
+          </button>
+        </div>
       </div>
 
       {/* Main 2x2 Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
         {/* Card 1: Quick compose */}
-        <div className="bg-white rounded-[28px] p-7 border border-[#e8ebf5] shadow-sm flex flex-col justify-between min-h-[300px]">
+        <div className="bg-white dark:bg-[#131226] rounded-[28px] p-7 border border-[#e8ebf5] dark:border-[#22203e] shadow-sm flex flex-col justify-between min-h-[300px] transition-colors">
           <div>
-            <h2 className="text-xl font-black text-[#121028] mb-4 relative inline-block">
-              <span className="border-b-[2.5px] border-[#121028] pb-0.5">Quick</span> compose
+            <h2 className="text-xl font-black text-[#121028] dark:text-white mb-4 relative inline-block">
+              <span className="border-b-[2.5px] border-[#121028] dark:border-white pb-0.5">Quick</span> compose
             </h2>
 
             {/* Content Input Box */}
-            <div className="bg-[#fbfbff] border border-[#e8ebf7] rounded-2xl p-4 mb-4 focus-within:border-[#5835F5] focus-within:bg-white transition-all">
+            <div className="bg-[#fbfbff] dark:bg-[#1a1833] border border-[#e8ebf7] dark:border-[#2a284c] rounded-2xl p-4 mb-4 focus-within:border-[#5835F5] focus-within:bg-white dark:focus-within:bg-[#1a1833] transition-all">
               <textarea
                 value={composeText}
                 onChange={(e) => setComposeText(e.target.value)}
                 placeholder="What would you like to share with your audience?"
                 rows={3}
-                className="w-full bg-transparent border-none text-sm text-[#121028] font-medium resize-none focus:outline-none placeholder-gray-400"
+                className="w-full bg-transparent border-none text-sm text-[#121028] dark:text-gray-100 font-medium resize-none focus:outline-none placeholder-gray-400"
               />
             </div>
 
@@ -234,7 +246,7 @@ const Dashboard = () => {
               <button
                 onClick={handleAiCaption}
                 disabled={isGeneratingAi}
-                className="bg-[#121028] hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-full cursor-pointer flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-75"
+                className="bg-[#121028] hover:bg-black dark:bg-white dark:text-[#121028] text-white text-xs font-bold px-4 py-2 rounded-full cursor-pointer flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-75"
               >
                 <Sparkles size={12} className={isGeneratingAi ? 'animate-spin' : ''} />
                 <span>{isGeneratingAi ? 'Writing...' : 'AI caption'}</span>
@@ -249,8 +261,8 @@ const Dashboard = () => {
                     onClick={() => togglePlatform(p)}
                     className={`text-xs font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-[#f0edff] text-[#5835F5] hover:bg-[#e4ddff]'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        ? 'bg-[#f0edff] dark:bg-[#5835F5]/25 text-[#5835F5] dark:text-[#9d89ff] hover:bg-[#e4ddff]'
+                        : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
                     }`}
                   >
                     {p}
@@ -264,7 +276,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-3 pt-2">
             <button
               onClick={() => openComposer()}
-              className="bg-white border border-[#e2e8f0] hover:border-gray-400 text-[#121028] rounded-full px-5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+              className="bg-white dark:bg-[#1a1833] border border-[#e2e8f0] dark:border-[#2a284c] hover:border-gray-400 text-[#121028] dark:text-gray-200 rounded-full px-5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
             >
               <span>{scheduledTime}</span>
             </button>
@@ -280,20 +292,20 @@ const Dashboard = () => {
         </div>
 
         {/* Card 2: Up next */}
-        <div className="bg-white rounded-[28px] p-7 border border-[#e8ebf5] shadow-sm flex flex-col justify-between min-h-[300px]">
+        <div className="bg-white dark:bg-[#131226] rounded-[28px] p-7 border border-[#e8ebf5] dark:border-[#22203e] shadow-sm flex flex-col justify-between min-h-[300px] transition-colors">
           <div>
-            <h2 className="text-xl font-black text-[#121028] mb-4">Up next</h2>
+            <h2 className="text-xl font-black text-[#121028] dark:text-white mb-4">Up next</h2>
 
             <div className="space-y-4">
               {posts.map((item, idx) => (
                 <div
                   key={item.id || idx}
                   onClick={() => navigate('/posts')}
-                  className="flex items-center justify-between pb-4 border-b border-[#f0f2f9] last:border-none last:pb-0 cursor-pointer group"
+                  className="flex items-center justify-between pb-4 border-b border-[#f0f2f9] dark:border-[#201e38] last:border-none last:pb-0 cursor-pointer group"
                 >
                   {/* Left: Day & Time */}
                   <div className="w-16 shrink-0">
-                    <p className="font-extrabold text-sm text-[#121028] group-hover:text-[#5835F5] transition-colors">
+                    <p className="font-extrabold text-sm text-[#121028] dark:text-white group-hover:text-[#5835F5] transition-colors">
                       {item.day}
                     </p>
                     <p className="text-[11px] text-[#8f92a9] font-medium">{item.time}</p>
@@ -301,7 +313,7 @@ const Dashboard = () => {
 
                   {/* Middle: Title & Platforms */}
                   <div className="flex-1 min-w-0 px-3">
-                    <p className="font-bold text-sm text-[#121028] truncate group-hover:text-[#5835F5] transition-colors">
+                    <p className="font-bold text-sm text-[#121028] dark:text-gray-200 truncate group-hover:text-[#5835F5] transition-colors">
                       {item.title}
                     </p>
                     <p className="text-[11px] text-[#8f92a9] font-medium truncate">
@@ -312,11 +324,11 @@ const Dashboard = () => {
                   {/* Right: Status Pill */}
                   <div className="shrink-0">
                     {item.status === 'Scheduled' ? (
-                      <span className="bg-[#10b981]/15 text-[#059669] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#10b981]/30">
+                      <span className="bg-[#10b981]/15 text-[#059669] dark:text-[#34d399] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#10b981]/30">
                         Scheduled
                       </span>
                     ) : (
-                      <span className="bg-[#f0edff] text-[#5835F5] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#5835F5]/30">
+                      <span className="bg-[#f0edff] dark:bg-[#5835F5]/25 text-[#5835F5] dark:text-[#9d89ff] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#5835F5]/30">
                         Draft
                       </span>
                     )}

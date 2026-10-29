@@ -1,12 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useComposer } from '../context/ComposerContext';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, ExternalLink } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { LogOut, Sun, Moon, ExternalLink } from 'lucide-react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const { openComposer } = useComposer();
   const { logout, user } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   const navItems = [
     { name: 'Dashboard', path: '/' },
@@ -62,6 +64,27 @@ const Sidebar = () => {
           );
         })}
       </nav>
+
+      {/* Night Mode Switcher */}
+      <div className="px-4 py-2 border-t border-[#1a1932]">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all text-xs font-semibold cursor-pointer border border-white/5"
+          title={`Switch to ${isDark ? 'Light' : 'Night'} Mode`}
+        >
+          <div className="flex items-center gap-2.5">
+            {isDark ? (
+              <Moon size={15} className="text-[#5835F5]" />
+            ) : (
+              <Sun size={15} className="text-[#f59e0b]" />
+            )}
+            <span>{isDark ? 'Night Mode' : 'Light Mode'}</span>
+          </div>
+          <div className={`w-8 h-4 rounded-full p-0.5 transition-colors ${isDark ? 'bg-[#5835F5]' : 'bg-gray-600'}`}>
+            <div className={`w-3 h-3 rounded-full bg-white transition-transform ${isDark ? 'translate-x-4' : 'translate-x-0'}`} />
+          </div>
+        </button>
+      </div>
 
       {/* User Footer info & Logout */}
       <div className="p-4 border-t border-[#1a1932] flex items-center justify-between">
