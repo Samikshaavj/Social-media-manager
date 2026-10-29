@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Send, 
@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const navItems = [
     { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+    { name: 'Posts', path: '/posts', icon: <Send size={20} /> },
     { name: 'Calendar', path: '/calendar', icon: <CalendarDays size={20} /> },
     { name: 'Accounts', path: '/accounts', icon: <Users size={20} /> },
     { name: 'Settings', path: '/settings', icon: <Settings size={20} /> },
@@ -28,7 +30,10 @@ const Sidebar = () => {
       </div>
 
       <div className="px-4 mb-6">
-        <button className="w-full bg-[#1a1a24] hover:bg-[#252536] text-indigo-400 border border-[#2d2d3f] rounded-xl py-2.5 flex items-center justify-center gap-2 font-medium transition-colors">
+        <button 
+          onClick={() => navigate('/accounts')}
+          className="w-full bg-[#1a1a24] hover:bg-[#252536] text-indigo-400 border border-[#2d2d3f] rounded-xl py-2.5 flex items-center justify-center gap-2 font-medium transition-colors cursor-pointer"
+        >
           <MessageSquare size={18} />
           Auto Reply
         </button>
