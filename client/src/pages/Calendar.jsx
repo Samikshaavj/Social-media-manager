@@ -70,10 +70,13 @@ const Calendar = () => {
   // Date comparison helpers
   const isSameCalendarDay = (d1, d2) => {
     if (!d1 || !d2) return false;
+    const date1 = d1 instanceof Date ? d1 : new Date(d1);
+    const date2 = d2 instanceof Date ? d2 : new Date(d2);
+    if (isNaN(date1.getTime()) || isNaN(date2.getTime())) return false;
     return (
-      d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate()
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
     );
   };
 
