@@ -3,13 +3,10 @@ import {
   ResponsiveContainer, 
   AreaChart, 
   Area, 
-  BarChart,
-  Bar,
   XAxis, 
   YAxis, 
   Tooltip, 
-  CartesianGrid,
-  Legend
+  CartesianGrid 
 } from 'recharts';
 import { 
   Activity, 
@@ -21,10 +18,8 @@ import {
   Eye, 
   Flame, 
   Users, 
-  ArrowUpRight,
-  Filter,
   BarChart3,
-  Layers
+  Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../api/axios';
@@ -150,6 +145,13 @@ const Analytics = () => {
     'Audience Reach': <Share2 className="text-purple-400" size={20} />
   };
 
+  const totalMetricSum = chartData.reduce((acc, curr) => acc + (Number(curr[selectedMetric]) || 0), 0);
+  const avgMetric = chartData.length > 0 ? Math.round(totalMetricSum / chartData.length) : 0;
+  const maxDay = chartData.reduce((max, curr) => 
+    (Number(curr[selectedMetric]) || 0) > (Number(max[selectedMetric]) || 0) ? curr : max, 
+    chartData[0] || {}
+  );
+
   return (
     <div className="text-gray-300 space-y-8">
       {/* Header */}
@@ -177,7 +179,7 @@ const Analytics = () => {
         </div>
       </div>
 
-      {/* Overview Stat Cards */}
+      {/* Overview Stat Cards (Shown strictly in Analytics section) */}
       {stats.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
@@ -206,7 +208,10 @@ const Analytics = () => {
       <div className="bg-[#111116] border border-[#1f1f2e] rounded-2xl p-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-lg font-bold text-white mb-1">Growth & Engagement Timeline</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp size={20} className="text-indigo-400" />
+              <h2 className="text-lg font-bold text-white">Performance Analytics & Trends</h2>
+            </div>
             <p className="text-xs text-gray-400">
               Aggregated daily performance records per platform.
             </p>
@@ -341,6 +346,28 @@ const Analytics = () => {
             </ResponsiveContainer>
           )}
         </div>
+
+        {/* Quick Analytics Summary Strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-[#1f1f2e] text-xs">
+          <div className="bg-[#181824]/60 p-3 rounded-xl border border-[#2d2d3f]/60">
+            <span className="text-gray-400 block mb-0.5">Total in Period:</span>
+            <span className="text-white font-bold text-sm">
+              {totalMetricSum.toLocaleString()} {selectedMetric}
+            </span>
+          </div>
+          <div className="bg-[#181824]/60 p-3 rounded-xl border border-[#2d2d3f]/60">
+            <span className="text-gray-400 block mb-0.5">Daily Average:</span>
+            <span className="text-white font-bold text-sm">
+              {avgMetric.toLocaleString()} / day
+            </span>
+          </div>
+          <div className="bg-[#181824]/60 p-3 rounded-xl border border-[#2d2d3f]/60">
+            <span className="text-gray-400 block mb-0.5">Peak Day:</span>
+            <span className="text-white font-bold text-sm">
+              {maxDay?.date ? `${maxDay.date} (${(maxDay[selectedMetric] || 0).toLocaleString()})` : 'N/A'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Top Posts Ranking Section */}
@@ -354,8 +381,9 @@ const Analytics = () => {
         </div>
 
         {topPosts.length === 0 ? (
-          <div className="text-gray-400 text-sm py-8 text-center bg-[#181824]/50 rounded-xl border border-[#2d2d3f]">
-            No published posts with performance metrics yet. Publish to see metrics!
+          <div className="text-gray-400 text-sm py-8 text-center bg-[#181824]/50 rounded-xl border border-[#2d2d3f] flex flex-col items-center justify-center gap-2">
+            <Sparkles size={24} className="text-indigo-400 opacity-60" />
+            <p>Publish posts across your platforms to automatically track live engagement rankings!</p>
           </div>
         ) : (
           <div className="space-y-3">
