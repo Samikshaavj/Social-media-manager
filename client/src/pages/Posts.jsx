@@ -1,6 +1,9 @@
 import { Plus } from 'lucide-react';
+import { useComposer } from '../context/ComposerContext';
 
 const Posts = () => {
+  const { openComposer } = useComposer();
+
   return (
     <div className="text-gray-300">
       <div className="mb-8">
@@ -21,7 +24,10 @@ const Posts = () => {
         </div>
         <h2 className="text-xl font-bold text-white mb-2">No posts found</h2>
         <p className="text-gray-500 text-center max-w-sm mb-6">You don't have any posts in this category yet. Create one to get started.</p>
-        <button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-2.5 text-sm font-medium transition-colors">
+        <button 
+          onClick={openComposer}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-6 py-2.5 text-sm font-medium transition-colors cursor-pointer"
+        >
           Create Post
         </button>
       </div>
