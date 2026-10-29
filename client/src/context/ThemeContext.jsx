@@ -5,19 +5,18 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('socialvibe_theme');
-    if (savedTheme) {
-      return savedTheme;
-    }
-    // Default to light as the user just requested the UI in the image, or match system
-    return 'light';
+    // Always default to 'light'
+    return savedTheme === 'dark' ? 'dark' : 'light';
   });
 
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
     } else {
       root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
     }
     localStorage.setItem('socialvibe_theme', theme);
   }, [theme]);

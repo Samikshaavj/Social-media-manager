@@ -25,30 +25,18 @@ const Landing = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-[#5835F5] hover:bg-[#4726e0] text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md flex items-center gap-2"
-            >
-              <span>Go to Dashboard</span>
-              <ArrowRight size={16} />
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate('/login')}
-                className="text-[#121028] hover:text-[#5835F5] px-4 py-2 font-bold text-sm transition-colors cursor-pointer"
-              >
-                Sign in
-              </button>
-              <button
-                onClick={() => navigate('/signup')}
-                className="bg-[#121028] hover:bg-black text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
-              >
-                Get started
-              </button>
-            </>
-          )}
+          <button
+            onClick={() => navigate('/login')}
+            className="text-[#121028] hover:text-[#5835F5] px-4 py-2 font-bold text-sm transition-colors cursor-pointer"
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
+            className="bg-[#121028] hover:bg-black text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+          >
+            {isAuthenticated ? 'Dashboard' : 'Get started'}
+          </button>
         </div>
       </nav>
 

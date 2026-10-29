@@ -7,20 +7,16 @@ import {
   Plus, 
   Users, 
   Send, 
-  MessageSquare,
-  Sun,
-  Moon
+  MessageSquare
 } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { useComposer } from '../context/ComposerContext';
-import { useTheme } from '../context/ThemeContext';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { openComposer, refreshTrigger } = useComposer();
-  const { isDark, toggleTheme } = useTheme();
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,25 +49,14 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 self-start sm:self-auto">
-          {/* Night Mode Switcher Button */}
-          <button
-            onClick={toggleTheme}
-            className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#181630] text-[#121028] dark:text-yellow-400 flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
-            title={`Switch to ${isDark ? 'Light' : 'Night'} Mode`}
-          >
-            {isDark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
-
-          {/* Create Post Button (SocialVibe Royal Purple Pill) */}
-          <button 
-            onClick={() => openComposer()}
-            className="bg-[#5835F5] hover:bg-[#4726e0] text-white rounded-full px-6 py-2.5 text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-[#5835f5]/25 hover:scale-105 active:scale-95"
-          >
-            <Plus size={18} />
-            <span>Create Post</span>
-          </button>
-        </div>
+        {/* Create Post Button (SocialVibe Royal Purple Pill) */}
+        <button 
+          onClick={() => openComposer()}
+          className="bg-[#5835F5] hover:bg-[#4726e0] text-white rounded-full px-6 py-2.5 text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-[#5835f5]/25 hover:scale-105 active:scale-95 self-start sm:self-auto"
+        >
+          <Plus size={18} />
+          <span>Create Post</span>
+        </button>
       </div>
 
       {/* Main Grid: Recent Posts & Quick Actions */}

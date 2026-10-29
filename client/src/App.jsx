@@ -18,18 +18,6 @@ import Landing from './pages/Landing';
 import ComposerModal from './components/ComposerModal';
 import './App.css';
 
-// When a user visits the root URL:
-// - If not logged in, they see the SocialVibe Landing Page (with Sign in / Sign up options).
-// - If already logged in, they are immediately taken to their /dashboard.
-const HomeRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
-  if (loading) return null;
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  return <Landing />;
-};
-
 function App() {
   return (
     <Router>
@@ -48,8 +36,8 @@ function App() {
             />
             <ComposerModal />
             <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<HomeRoute />} />
+              {/* Public Routes - Landing page is the website front page */}
+              <Route path="/" element={<Landing />} />
               <Route path="/landing" element={<Landing />} />
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
