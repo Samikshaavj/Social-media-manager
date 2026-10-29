@@ -9,10 +9,12 @@ import Signup from './pages/Signup';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
+import BrandBrain from './pages/BrandBrain';
 import Posts from './pages/Posts';
 import Calendar from './pages/Calendar';
 import Accounts from './pages/Accounts';
 import Settings from './pages/Settings';
+import Landing from './pages/Landing';
 import ComposerModal from './components/ComposerModal';
 import './App.css';
 
@@ -33,7 +35,8 @@ function App() {
           />
           <ComposerModal />
           <Routes>
-          {/* Public Auth Routes */}
+          {/* Public Routes */}
+          <Route path="/landing" element={<Landing />} />
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -44,6 +47,7 @@ function App() {
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="analytics" element={<Analytics />} />
+              <Route path="brand-brain" element={<BrandBrain />} />
               <Route path="posts" element={<Posts />} />
               <Route path="calendar" element={<Calendar />} />
               <Route path="accounts" element={<Accounts />} />
