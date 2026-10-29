@@ -14,7 +14,7 @@ const Login = () => {
     setError('');
     const res = await login(identifier, password);
     if (res.success) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
       setError(res.error);
     }

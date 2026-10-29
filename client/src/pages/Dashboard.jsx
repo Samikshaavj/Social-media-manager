@@ -1,207 +1,60 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Sun, Moon } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { 
+  Calendar as CalendarIcon, 
+  Clock, 
+  ArrowRight, 
+  Plus, 
+  Users, 
+  Send, 
+  MessageSquare,
+  Sun,
+  Moon
+} from 'lucide-react';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import { useComposer } from '../context/ComposerContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { openComposer, refreshTrigger, triggerRefresh } = useComposer();
+  const { openComposer, refreshTrigger } = useComposer();
   const { isDark, toggleTheme } = useTheme();
 
-  // Day selector state (M, T, W, T, F, S, S)
-  const days = [
-    { label: 'M', active: true, name: 'Monday' },
-    { label: 'T', active: false, name: 'Tuesday' },
-    { label: 'W', active: true, name: 'Wednesday' },
-    { label: 'T', active: false, name: 'Thursday' },
-    { label: 'F', active: true, name: 'Friday' },
-    { label: 'S', active: true, name: 'Saturday' },
-    { label: 'S', active: false, name: 'Sunday' }
-  ];
-  const [selectedDayIndex, setSelectedDayIndex] = useState(4); // Friday default
-
-  // Quick Compose state
-  const [composeText, setComposeText] = useState('Weekend sale starts Friday. Three new pieces and one very good reason to visit.');
-  const [selectedPlatforms, setSelectedPlatforms] = useState(['Instagram', 'LinkedIn', 'Facebook']);
-  const [scheduledTime, setScheduledTime] = useState('Fri, 7:00 pm');
-  const [isScheduling, setIsScheduling] = useState(false);
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-
-  // Up next posts state
   const [posts, setPosts] = useState([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-
-  // Default fallback items matching reference image if DB has few posts
-  const defaultUpNext = [
-    {
-      id: 'mock-1',
-      day: 'Fri',
-      time: '7:00 pm',
-      title: 'Weekend sale starts Friday',
-      platforms: 'Instagram, LinkedIn, Facebook',
-      status: 'Scheduled'
-    },
-    {
-      id: 'mock-2',
-      day: 'Sat',
-      time: '10:00 am',
-      title: 'Behind the scenes',
-      platforms: 'X',
-      status: 'Scheduled'
-    },
-    {
-      id: 'mock-3',
-      day: 'Mon',
-      time: '9:00 am',
-      title: 'New arrivals roundup',
-      platforms: 'Facebook',
-      status: 'Draft'
-    }
-  ];
-
-  const fetchUpcomingPosts = async () => {
-    try {
-      setLoadingPosts(true);
-      const res = await api.get('/posts');
-      if (res.data && res.data.length > 0) {
-        const mapped = res.data.slice(0, 3).map((p) => {
-          const dateObj = p.scheduledFor ? new Date(p.scheduledFor) : new Date();
-          const dayName = dateObj.toLocaleDateString([], { weekday: 'short' });
-          const timeStr = dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-          const platformsStr = p.publications?.map(pub => pub.platform).join(', ') || 'Multi-platform';
-          return {
-            id: p._id,
-            day: dayName,
-            time: timeStr,
-            title: p.globalContent || 'Scheduled post update',
-            platforms: platformsStr,
-            status: p.status === 'PUBLISHED' ? 'Scheduled' : (p.status === 'SCHEDULED' ? 'Scheduled' : 'Draft')
-          };
-        });
-        setPosts(mapped);
-      } else {
-        setPosts(defaultUpNext);
-      }
-    } catch (error) {
-      console.error('Error fetching upcoming posts:', error);
-      setPosts(defaultUpNext);
-    } finally {
-      setLoadingPosts(false);
-    }
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUpcomingPosts();
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get('/posts');
+        setPosts(res.data?.slice(0, 5) || []);
+      } catch (error) {
+        console.error('Error fetching dashboard posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
   }, [refreshTrigger]);
 
-  const togglePlatform = (platform) => {
-    if (selectedPlatforms.includes(platform)) {
-      if (selectedPlatforms.length > 1) {
-        setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform));
-      } else {
-        toast.error('Select at least one platform');
-      }
-    } else {
-      setSelectedPlatforms([...selectedPlatforms, platform]);
-    }
-  };
-
-  const handleAiCaption = () => {
-    setIsGeneratingAi(true);
-    setTimeout(() => {
-      const suggestions = [
-        "Weekend sale starts Friday! ✨ Three exclusive new pieces just landed and one irresistible reason to stop by.",
-        "Dropping this Friday: three fresh designs you won't want to miss. Tap the link in bio to preview early!",
-        "Our biggest weekend drop is officially live this Friday at 7 PM. Stay tuned for the VIP access codes."
-      ];
-      const random = suggestions[Math.floor(Math.random() * suggestions.length)];
-      setComposeText(random);
-      setIsGeneratingAi(false);
-      toast.success('AI caption generated in your brand voice!');
-    }, 450);
-  };
-
-  const handleQuickSchedule = async () => {
-    if (!composeText.trim()) {
-      toast.error('Please enter post content');
-      return;
-    }
-
-    try {
-      setIsScheduling(true);
-      const nextDate = new Date();
-      nextDate.setDate(nextDate.getDate() + ((5 + 7 - nextDate.getDay()) % 7 || 7));
-      nextDate.setHours(19, 0, 0, 0);
-
-      await api.post('/posts', {
-        globalContent: composeText,
-        scheduledFor: nextDate.toISOString(),
-        status: 'SCHEDULED',
-        platforms: selectedPlatforms.map(p => ({
-          platform: p === 'X' ? 'Twitter' : p,
-          content: composeText,
-          status: 'SCHEDULED'
-        }))
-      });
-
-      toast.success('Post successfully scheduled for Fri, 7:00 pm!');
-      triggerRefresh();
-      fetchUpcomingPosts();
-    } catch (error) {
-      console.error('Schedule error:', error);
-      toast.success('Post scheduled for Friday, 7:00 pm!');
-      setPosts(prev => [
-        {
-          id: Date.now().toString(),
-          day: 'Fri',
-          time: '7:00 pm',
-          title: composeText,
-          platforms: selectedPlatforms.join(', '),
-          status: 'Scheduled'
-        },
-        ...prev.slice(0, 2)
-      ]);
-    } finally {
-      setIsScheduling(false);
-    }
-  };
-
   return (
-    <div className="max-w-[1240px] mx-auto text-[#121028] dark:text-gray-100 space-y-9 transition-colors">
-      {/* Top Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+    <div className="max-w-[1240px] mx-auto text-[#121028] dark:text-gray-100 space-y-8 transition-colors">
+      {/* Welcome Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-black text-[#121028] dark:text-white tracking-tight mb-4">
-            This week
+          <h1 className="text-3xl sm:text-4xl font-black text-[#121028] dark:text-white tracking-tight mb-1.5">
+            Welcome back, {user?.username || user?.name || 'User'} 👋
           </h1>
-          {/* Day of Week Selector: M, T, W, T, F, S, S */}
-          <div className="flex items-center gap-2">
-            {days.map((day, idx) => {
-              const isSelected = selectedDayIndex === idx;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedDayIndex(idx)}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-xs transition-all cursor-pointer ${
-                    day.active || isSelected
-                      ? 'bg-[#121028] dark:bg-[#5835F5] text-white shadow-sm'
-                      : 'border-2 border-[#121028] dark:border-gray-600 bg-transparent text-[#121028] dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'
-                  }`}
-                  title={day.name}
-                >
-                  {day.label}
-                </button>
-              );
-            })}
-          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+            Here's what's happening with your social accounts and scheduled posts today.
+          </p>
         </div>
 
-        {/* Top Right Actions: Theme Toggle & New post */}
         <div className="flex items-center gap-3 self-start sm:self-auto">
-          {/* Theme Quick Toggle */}
+          {/* Night Mode Switcher Button */}
           <button
             onClick={toggleTheme}
             className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 bg-white dark:bg-[#181630] text-[#121028] dark:text-yellow-400 flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
@@ -210,181 +63,157 @@ const Dashboard = () => {
             {isDark ? <Sun size={17} /> : <Moon size={17} />}
           </button>
 
-          {/* New post Action Button */}
-          <button
+          {/* Create Post Button (SocialVibe Royal Purple Pill) */}
+          <button 
             onClick={() => openComposer()}
-            className="bg-[#121028] hover:bg-black dark:bg-white dark:text-[#121028] dark:hover:bg-gray-100 text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+            className="bg-[#5835F5] hover:bg-[#4726e0] text-white rounded-full px-6 py-2.5 text-sm font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md shadow-[#5835f5]/25 hover:scale-105 active:scale-95"
           >
-            New post
+            <Plus size={18} />
+            <span>Create Post</span>
           </button>
         </div>
       </div>
 
-      {/* Main 2x2 Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
-        {/* Card 1: Quick compose */}
-        <div className="bg-white dark:bg-[#131226] rounded-[28px] p-7 border border-[#e8ebf5] dark:border-[#22203e] shadow-sm flex flex-col justify-between min-h-[300px] transition-colors">
-          <div>
-            <h2 className="text-xl font-black text-[#121028] dark:text-white mb-4 relative inline-block">
-              <span className="border-b-[2.5px] border-[#121028] dark:border-white pb-0.5">Quick</span> compose
-            </h2>
-
-            {/* Content Input Box */}
-            <div className="bg-[#fbfbff] dark:bg-[#1a1833] border border-[#e8ebf7] dark:border-[#2a284c] rounded-2xl p-4 mb-4 focus-within:border-[#5835F5] focus-within:bg-white dark:focus-within:bg-[#1a1833] transition-all">
-              <textarea
-                value={composeText}
-                onChange={(e) => setComposeText(e.target.value)}
-                placeholder="What would you like to share with your audience?"
-                rows={3}
-                className="w-full bg-transparent border-none text-sm text-[#121028] dark:text-gray-100 font-medium resize-none focus:outline-none placeholder-gray-400"
-              />
-            </div>
-
-            {/* Tag Pills Row */}
-            <div className="flex items-center gap-2 flex-wrap mb-6">
-              {/* AI caption */}
-              <button
-                onClick={handleAiCaption}
-                disabled={isGeneratingAi}
-                className="bg-[#121028] hover:bg-black dark:bg-white dark:text-[#121028] text-white text-xs font-bold px-4 py-2 rounded-full cursor-pointer flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-75"
-              >
-                <Sparkles size={12} className={isGeneratingAi ? 'animate-spin' : ''} />
-                <span>{isGeneratingAi ? 'Writing...' : 'AI caption'}</span>
-              </button>
-
-              {/* Platform Pills */}
-              {['Instagram', 'LinkedIn', 'Facebook'].map((p) => {
-                const isSelected = selectedPlatforms.includes(p);
-                return (
-                  <button
-                    key={p}
-                    onClick={() => togglePlatform(p)}
-                    className={`text-xs font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#f0edff] dark:bg-[#5835F5]/25 text-[#5835F5] dark:text-[#9d89ff] hover:bg-[#e4ddff]'
-                        : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10'
-                    }`}
-                  >
-                    {p}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Action Row */}
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              onClick={() => openComposer()}
-              className="bg-white dark:bg-[#1a1833] border border-[#e2e8f0] dark:border-[#2a284c] hover:border-gray-400 text-[#121028] dark:text-gray-200 rounded-full px-5 py-2 text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
+      {/* Main Grid: Recent Posts & Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
+        {/* Recent Posts Section */}
+        <div className="lg:col-span-2 bg-white dark:bg-[#131226] border border-[#e8ebf5] dark:border-[#22203e] rounded-[28px] p-7 shadow-sm transition-colors">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-black text-[#121028] dark:text-white">Recent Posts</h2>
+            <button 
+              onClick={() => navigate('/posts')}
+              className="text-[#5835F5] hover:text-[#4726e0] dark:text-[#9d89ff] text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
             >
-              <span>{scheduledTime}</span>
-            </button>
-
-            <button
-              onClick={handleQuickSchedule}
-              disabled={isScheduling}
-              className="bg-[#5835F5] hover:bg-[#4825e5] text-white rounded-full px-7 py-2.5 text-xs font-bold transition-all shadow-md shadow-[#5835f5]/30 cursor-pointer disabled:opacity-70 active:scale-95"
-            >
-              {isScheduling ? 'Scheduling...' : 'Schedule'}
+              <span>View All</span>
+              <ArrowRight size={14} />
             </button>
           </div>
-        </div>
-
-        {/* Card 2: Up next */}
-        <div className="bg-white dark:bg-[#131226] rounded-[28px] p-7 border border-[#e8ebf5] dark:border-[#22203e] shadow-sm flex flex-col justify-between min-h-[300px] transition-colors">
-          <div>
-            <h2 className="text-xl font-black text-[#121028] dark:text-white mb-4">Up next</h2>
-
-            <div className="space-y-4">
-              {posts.map((item, idx) => (
-                <div
-                  key={item.id || idx}
-                  onClick={() => navigate('/posts')}
-                  className="flex items-center justify-between pb-4 border-b border-[#f0f2f9] dark:border-[#201e38] last:border-none last:pb-0 cursor-pointer group"
+          
+          <div className="space-y-3.5">
+            {loading ? (
+              <div className="text-gray-400 text-sm py-12 text-center flex items-center justify-center gap-2">
+                <Clock size={16} className="animate-spin text-[#5835F5]" />
+                <span className="font-medium">Loading posts...</span>
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="text-gray-500 dark:text-gray-400 text-sm py-12 text-center bg-[#fbfbff] dark:bg-[#1a1833] rounded-2xl border border-[#e8ebf7] dark:border-[#2a284c] flex flex-col items-center justify-center gap-3">
+                <p className="font-medium">No posts found. Create or schedule your first post!</p>
+                <button 
+                  onClick={() => openComposer()}
+                  className="bg-[#5835F5] hover:bg-[#4726e0] text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all cursor-pointer shadow-sm"
                 >
-                  {/* Left: Day & Time */}
-                  <div className="w-16 shrink-0">
-                    <p className="font-extrabold text-sm text-[#121028] dark:text-white group-hover:text-[#5835F5] transition-colors">
-                      {item.day}
-                    </p>
-                    <p className="text-[11px] text-[#8f92a9] font-medium">{item.time}</p>
+                  Create Post
+                </button>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <div 
+                  key={post._id} 
+                  onClick={() => navigate('/posts')}
+                  className="flex items-start gap-4 p-4 rounded-2xl border border-[#f0f2f9] dark:border-[#201e38] bg-[#fbfbff] dark:bg-[#1a1833] hover:border-[#5835F5]/40 hover:bg-white dark:hover:bg-[#1f1d3d] transition-all cursor-pointer group shadow-sm"
+                >
+                  <div className="w-10 h-10 rounded-2xl bg-[#f0edff] dark:bg-[#5835F5]/20 flex items-center justify-center shrink-0 text-[#5835F5] dark:text-[#9d89ff] group-hover:scale-105 transition-transform">
+                    <CalendarIcon size={18} />
                   </div>
-
-                  {/* Middle: Title & Platforms */}
-                  <div className="flex-1 min-w-0 px-3">
-                    <p className="font-bold text-sm text-[#121028] dark:text-gray-200 truncate group-hover:text-[#5835F5] transition-colors">
-                      {item.title}
-                    </p>
-                    <p className="text-[11px] text-[#8f92a9] font-medium truncate">
-                      {item.platforms}
-                    </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-xs font-black text-[#121028] dark:text-white truncate max-w-[200px]">
+                        {post.publications?.map(p => p.platform).join(', ') || 'Draft'}
+                      </span>
+                      <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                      <span className="text-[11px] text-[#8f92a9] font-medium flex items-center gap-1">
+                        <Clock size={11} />
+                        {post.scheduledFor ? new Date(post.scheduledFor).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Not scheduled'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-[#121028] dark:text-gray-200 font-medium line-clamp-1">{post.globalContent}</p>
                   </div>
-
-                  {/* Right: Status Pill */}
-                  <div className="shrink-0">
-                    {item.status === 'Scheduled' ? (
-                      <span className="bg-[#10b981]/15 text-[#059669] dark:text-[#34d399] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#10b981]/30">
-                        Scheduled
-                      </span>
-                    ) : (
-                      <span className="bg-[#f0edff] dark:bg-[#5835F5]/25 text-[#5835F5] dark:text-[#9d89ff] font-extrabold text-xs px-3.5 py-1 rounded-full border border-[#5835F5]/30">
-                        Draft
-                      </span>
-                    )}
+                  <div className="shrink-0 self-center">
+                    <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${
+                      post.status === 'PUBLISHED' ? 'bg-[#10b981]/15 text-[#059669] dark:text-[#34d399] border-[#10b981]/25' : 
+                      post.status === 'SCHEDULED' ? 'bg-[#f0edff] dark:bg-[#5835F5]/25 text-[#5835F5] dark:text-[#9d89ff] border-[#5835F5]/25' : 
+                      'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10'
+                    }`}>
+                      {post.status}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Card 3: INSIGHT */}
-        <div 
-          onClick={() => navigate('/analytics')}
-          className="bg-[#ffd246] rounded-[28px] p-8 text-[#121028] shadow-sm flex flex-col justify-center min-h-[190px] cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all"
-        >
-          <span className="font-black text-xs tracking-widest text-[#121028]/80 mb-2 uppercase">
-            INSIGHT
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-[#121028] leading-tight mb-2 tracking-tight">
-            Thursday evenings are your strongest slot.
-          </h3>
-          <p className="text-sm font-semibold text-[#121028]/90">
-            Try moving one more post there this week.
-          </p>
-        </div>
+        {/* Quick Actions Section */}
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-[#131226] border border-[#e8ebf5] dark:border-[#22203e] rounded-[28px] p-6 shadow-sm flex flex-col gap-3 transition-colors">
+            <h2 className="text-xl font-black text-[#121028] dark:text-white mb-2">Quick Actions</h2>
 
-        {/* Card 4: BRAND BRAIN */}
-        <div className="bg-[#5835F5] rounded-[28px] p-8 text-white shadow-sm flex flex-col justify-between min-h-[190px]">
-          <div>
-            <span className="font-black text-xs tracking-widest text-white/80 mb-2 uppercase block">
-              BRAND BRAIN
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-5 tracking-tight">
-              3 sources ready
-            </h3>
-          </div>
+            {/* Connect new platform */}
+            <button 
+              onClick={() => navigate('/accounts')}
+              className="flex items-center justify-between w-full p-3.5 bg-[#fbfbff] dark:bg-[#1a1833] hover:bg-[#f5f3ff] dark:hover:bg-[#222044] border border-[#f0f2f9] dark:border-[#201e38] hover:border-[#5835F5]/40 rounded-2xl text-sm transition-all cursor-pointer group shadow-sm text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#ff4b72]/15 text-[#ff4b72] flex items-center justify-center shrink-0">
+                  <Users size={16} />
+                </div>
+                <div>
+                  <p className="font-bold text-xs text-[#121028] dark:text-white">Connect new platform</p>
+                  <p className="text-[11px] text-[#8f92a9] font-medium">Add Instagram, YouTube, LinkedIn...</p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#8f92a9] group-hover:text-[#5835F5] group-hover:translate-x-1 transition-all" />
+            </button>
 
-          {/* Source Pills */}
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <button
-              onClick={() => navigate('/brand-brain')}
-              className="bg-white hover:bg-gray-100 text-[#121028] text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all cursor-pointer hover:scale-105 active:scale-95"
+            {/* Schedule new post */}
+            <button 
+              onClick={() => openComposer()}
+              className="flex items-center justify-between w-full p-3.5 bg-[#fbfbff] dark:bg-[#1a1833] hover:bg-[#f5f3ff] dark:hover:bg-[#222044] border border-[#f0f2f9] dark:border-[#201e38] hover:border-[#5835F5]/40 rounded-2xl text-sm transition-all cursor-pointer group shadow-sm text-left"
             >
-              About page
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#5835F5]/15 text-[#5835F5] flex items-center justify-center shrink-0">
+                  <Send size={16} />
+                </div>
+                <div>
+                  <p className="font-bold text-xs text-[#121028] dark:text-white">Schedule new post</p>
+                  <p className="text-[11px] text-[#8f92a9] font-medium">Queue across multiple platforms</p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#8f92a9] group-hover:text-[#5835F5] group-hover:translate-x-1 transition-all" />
             </button>
-            <button
-              onClick={() => navigate('/brand-brain')}
-              className="bg-white hover:bg-gray-100 text-[#121028] text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all cursor-pointer hover:scale-105 active:scale-95"
+
+            {/* View Content Calendar */}
+            <button 
+              onClick={() => navigate('/calendar')}
+              className="flex items-center justify-between w-full p-3.5 bg-[#fbfbff] dark:bg-[#1a1833] hover:bg-[#f5f3ff] dark:hover:bg-[#222044] border border-[#f0f2f9] dark:border-[#201e38] hover:border-[#5835F5]/40 rounded-2xl text-sm transition-all cursor-pointer group shadow-sm text-left"
             >
-              March offer
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#ffd246]/20 text-[#d97706] dark:text-[#ffd246] flex items-center justify-center shrink-0">
+                  <CalendarIcon size={16} />
+                </div>
+                <div>
+                  <p className="font-bold text-xs text-[#121028] dark:text-white">View content calendar</p>
+                  <p className="text-[11px] text-[#8f92a9] font-medium">Plan and track your timeline</p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#8f92a9] group-hover:text-[#5835F5] group-hover:translate-x-1 transition-all" />
             </button>
-            <button
-              onClick={() => navigate('/brand-brain')}
-              className="bg-white hover:bg-gray-100 text-[#121028] text-xs font-bold px-4 py-2 rounded-full shadow-sm transition-all cursor-pointer hover:scale-105 active:scale-95"
+
+            {/* Configure auto-replies */}
+            <button 
+              onClick={() => navigate('/accounts')}
+              className="flex items-center justify-between w-full p-3.5 bg-[#fbfbff] dark:bg-[#1a1833] hover:bg-[#f5f3ff] dark:hover:bg-[#222044] border border-[#f0f2f9] dark:border-[#201e38] hover:border-[#5835F5]/40 rounded-2xl text-sm transition-all cursor-pointer group shadow-sm text-left"
             >
-              Past posts
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center shrink-0">
+                  <MessageSquare size={16} />
+                </div>
+                <div>
+                  <p className="font-bold text-xs text-[#121028] dark:text-white">Configure auto-replies</p>
+                  <p className="text-[11px] text-[#8f92a9] font-medium">Manage social accounts & rules</p>
+                </div>
+              </div>
+              <ArrowRight size={15} className="text-[#8f92a9] group-hover:text-[#5835F5] group-hover:translate-x-1 transition-all" />
             </button>
           </div>
         </div>

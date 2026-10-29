@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, Check, Send, Calendar, Brain } from 'lucide-react';
+import { Sparkles, ArrowRight, LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-white text-[#121028] font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-white text-[#121028] font-sans overflow-x-hidden selection:bg-[#ffd246] selection:text-[#121028]">
       {/* Navigation Header */}
       <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -22,16 +24,36 @@ const Landing = () => {
           <a href="#how-it-works" className="hover:text-black transition-colors">How it works</a>
         </div>
 
-        <button
-          onClick={() => navigate('/login')}
-          className="bg-[#121028] hover:bg-black text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md"
-        >
-          Get started
-        </button>
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="bg-[#5835F5] hover:bg-[#4726e0] text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md flex items-center gap-2"
+            >
+              <span>Go to Dashboard</span>
+              <ArrowRight size={16} />
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-[#121028] hover:text-[#5835F5] px-4 py-2 font-bold text-sm transition-colors cursor-pointer"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => navigate('/signup')}
+                className="bg-[#121028] hover:bg-black text-white rounded-full px-6 py-2.5 font-bold text-sm transition-all cursor-pointer shadow-md hover:scale-105 active:scale-95"
+              >
+                Get started
+              </button>
+            </>
+          )}
+        </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 pt-12 pb-20">
+      <section className="max-w-6xl mx-auto px-6 pt-10 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Text */}
           <div className="space-y-6">
@@ -51,17 +73,20 @@ const Landing = () => {
 
             <div className="flex items-center gap-4 pt-2 flex-wrap">
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
                 className="bg-[#121028] hover:bg-black text-white px-8 py-3.5 rounded-full font-bold text-sm transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
               >
-                Get started
+                {isAuthenticated ? 'Go to Dashboard' : 'Get started'}
               </button>
-              <button
-                onClick={() => navigate('/')}
-                className="border-2 border-[#121028] hover:bg-black/5 text-[#121028] px-8 py-3.5 rounded-full font-bold text-sm transition-all cursor-pointer"
-              >
-                See how it works
-              </button>
+              
+              {!isAuthenticated && (
+                <button
+                  onClick={() => navigate('/login')}
+                  className="border-2 border-[#121028] hover:bg-black/5 text-[#121028] px-8 py-3.5 rounded-full font-bold text-sm transition-all cursor-pointer"
+                >
+                  Sign in
+                </button>
+              )}
             </div>
           </div>
 
@@ -109,7 +134,7 @@ const Landing = () => {
 
       {/* Marquee Banner */}
       <div className="bg-[#5835F5] text-white py-4 overflow-hidden whitespace-nowrap shadow-inner">
-        <div className="flex items-center justify-around gap-8 font-black text-lg sm:text-xl tracking-wider uppercase animate-pulse">
+        <div className="flex items-center justify-around gap-8 font-black text-lg sm:text-xl tracking-wider uppercase">
           <span>Schedule</span>
           <span className="w-2 h-2 rounded-full bg-white"></span>
           <span>Create</span>
@@ -297,12 +322,22 @@ const Landing = () => {
             Ready to find your rhythm?
           </h2>
 
-          <button
-            onClick={() => navigate('/login')}
-            className="bg-[#ffd246] hover:bg-[#ffc820] text-[#121028] rounded-full px-9 py-4 font-black text-sm transition-all cursor-pointer shadow-xl hover:scale-105 active:scale-95"
-          >
-            Get started
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
+              className="bg-[#ffd246] hover:bg-[#ffc820] text-[#121028] rounded-full px-9 py-4 font-black text-sm transition-all cursor-pointer shadow-xl hover:scale-105 active:scale-95"
+            >
+              {isAuthenticated ? 'Open Dashboard' : 'Get started'}
+            </button>
+            {!isAuthenticated && (
+              <button
+                onClick={() => navigate('/login')}
+                className="text-white hover:text-[#ffd246] font-bold text-sm px-6 py-3 cursor-pointer underline transition-colors"
+              >
+                Sign in to your account
+              </button>
+            )}
+          </div>
         </div>
       </section>
 

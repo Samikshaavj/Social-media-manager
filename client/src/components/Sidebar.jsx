@@ -11,12 +11,11 @@ const Sidebar = () => {
   const { isDark, toggleTheme } = useTheme();
 
   const navItems = [
-    { name: 'Dashboard', path: '/' },
-    { name: 'Compose', action: () => openComposer() },
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Posts', path: '/posts' },
     { name: 'Calendar', path: '/calendar' },
-    { name: 'Brand Brain', path: '/brand-brain' },
-    { name: 'Campaigns', path: '/posts' },
-    { name: 'Insights', path: '/analytics' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Accounts', path: '/accounts' },
     { name: 'Settings', path: '/settings' },
   ];
 
