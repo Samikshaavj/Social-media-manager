@@ -30,12 +30,8 @@ const ComposerModal = () => {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = originalOverflow;
     };
   }, [isComposerOpen, closeComposer]);
 
@@ -119,33 +115,43 @@ const ComposerModal = () => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
+      className="composer-overlay fixed inset-0 z-50 flex flex-col items-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm overflow-y-auto"
+      style={{ overflowY: 'auto' }}
       onClick={(e) => {
         if (e.target === e.currentTarget) closeComposer();
       }}
     >
-      <div className="bg-[#111116] border border-[#1f1f2e] w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] my-auto overflow-hidden">
+      <div 
+        className="composer-card bg-[#111116] border border-[#1f1f2e] w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col my-auto overflow-hidden"
+        style={{
+          maxHeight: 'calc(100vh - 2rem)',
+          minHeight: 0,
+        }}
+      >
         
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#1f1f2e] shrink-0">
-          <h2 className="text-lg sm:text-xl font-bold text-white">Create New Post</h2>
+        {/* Header - Fixed at Top */}
+        <div className="composer-header flex items-center justify-between p-4 border-b border-[#1f1f2e] shrink-0">
+          <h2 className="text-lg font-bold text-white">Create New Post</h2>
           <button 
             type="button"
             onClick={closeComposer} 
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#1a1a24] cursor-pointer"
+            className="text-gray-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#1a1a24] cursor-pointer"
             aria-label="Close modal"
           >
-            <X size={22} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Content Area */}
-        <div className="p-4 sm:p-6 flex flex-col gap-5 sm:gap-6 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
+        {/* Content Area - Scrollable */}
+        <div 
+          className="composer-body p-4 sm:p-5 flex flex-col gap-4 overflow-y-auto flex-1 min-h-0"
+          style={{ overflowY: 'auto', minHeight: 0 }}
+        >
           
           {/* Platform Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">Select Platforms</label>
-            <div className="flex gap-3 flex-wrap">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Select Platforms</label>
+            <div className="flex gap-2.5 flex-wrap">
               {platformsList.map(platform => {
                 const isSelected = selectedPlatforms.includes(platform.id);
                 return (
@@ -153,14 +159,14 @@ const ComposerModal = () => {
                     type="button"
                     key={platform.id}
                     onClick={() => togglePlatform(platform.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-sm font-medium transition-all cursor-pointer ${
                       isSelected 
                         ? 'bg-indigo-500/20 border-indigo-500 text-indigo-400' 
                         : `bg-[#1a1a24] border-[#2d2d3f] text-gray-400 ${platform.color}`
                     }`}
                   >
                     {platform.icon}
-                    <span className="text-sm font-medium">{platform.id}</span>
+                    <span>{platform.id}</span>
                   </button>
                 );
               })}
@@ -169,32 +175,35 @@ const ComposerModal = () => {
 
           {/* Text Editor */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium text-gray-400">Post Content</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">Post Content</label>
               <button 
                 type="button"
                 onClick={handleAIWrite}
                 disabled={isGeneratingAI || !content.trim()}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 hover:from-purple-500/30 hover:to-indigo-500/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                <Sparkles size={14} />
+                <Sparkles size={13} />
                 {isGeneratingAI ? 'Generating...' : 'AI Write'}
               </button>
             </div>
             <textarea 
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full h-36 bg-[#1a1a24] border border-[#2d2d3f] rounded-xl p-4 text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors resize-y min-h-[120px] custom-scrollbar"
+              rows={3}
+              className="w-full bg-[#1a1a24] border border-[#2d2d3f] rounded-xl p-3.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 transition-colors resize-y min-h-[80px]"
               placeholder="What do you want to share with your audience? Write a short prompt and click 'AI Write' to generate a full caption."
             />
           </div>
 
           {/* Media Upload Area */}
           <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Media Assets</label>
+            
             {mediaFiles.length > 0 && (
-              <div className="flex gap-4 mb-4 overflow-x-auto pb-2 custom-scrollbar">
+              <div className="flex gap-3 mb-3 overflow-x-auto pb-1">
                 {mediaFiles.map((media, idx) => (
-                  <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-[#2d2d3f] flex-shrink-0 group">
+                  <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#2d2d3f] shrink-0 group">
                     {media.type === 'VIDEO' ? (
                       <video src={media.url} className="w-full h-full object-cover" />
                     ) : (
@@ -203,7 +212,7 @@ const ComposerModal = () => {
                     <button 
                       type="button"
                       onClick={() => removeMedia(idx)}
-                      className="absolute top-1 right-1 bg-black/70 hover:bg-black p-1 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      className="absolute top-1 right-1 bg-black/75 hover:bg-black p-1 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       title="Remove"
                     >
                       <X size={12} />
@@ -212,43 +221,44 @@ const ComposerModal = () => {
                 ))}
               </div>
             )}
-            <label className="border-2 border-dashed border-[#2d2d3f] rounded-xl p-6 flex flex-col items-center justify-center text-gray-500 hover:border-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer bg-[#1a1a24]/50 relative">
+
+            <label className="border border-dashed border-[#2d2d3f] rounded-xl p-3.5 flex items-center justify-center gap-3 text-gray-400 hover:border-indigo-500 hover:text-indigo-400 transition-colors cursor-pointer bg-[#1a1a24]/40 relative">
               <input type="file" className="hidden" accept="image/*,video/*" onChange={handleFileUpload} disabled={isUploading} />
               {isUploading ? (
-                <div className="text-sm font-medium animate-pulse text-indigo-400">Uploading...</div>
+                <div className="text-xs font-medium animate-pulse text-indigo-400">Uploading media...</div>
               ) : (
                 <>
-                  <ImageIcon size={32} className="mb-2" />
-                  <p className="text-sm font-medium">Drag & drop media here, or click to browse</p>
-                  <p className={`text-xs mt-1 ${selectedPlatforms.includes('YouTube') ? 'text-indigo-400 font-medium' : 'opacity-60'}`}>
-                    {selectedPlatforms.includes('YouTube') 
-                      ? 'Supports only MP4' 
-                      : 'Supports JPG, PNG, MP4'}
-                  </p>
+                  <ImageIcon size={20} className="text-indigo-400" />
+                  <span className="text-xs font-medium">
+                    {mediaFiles.length > 0 ? 'Click to add more media' : 'Click or drop image/video to upload'}
+                  </span>
+                  <span className="text-[11px] text-gray-500">
+                    ({selectedPlatforms.includes('YouTube') ? 'MP4 only' : 'JPG, PNG, MP4'})
+                  </span>
                 </>
               )}
             </label>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-4 sm:p-5 border-t border-[#1f1f2e] bg-[#0B0B0F] flex items-center justify-between shrink-0">
-          <button type="button" className="text-gray-400 hover:text-white transition-colors px-4 py-2 text-sm font-medium cursor-pointer">
+        {/* Footer Actions - Fixed at Bottom */}
+        <div className="composer-footer p-4 border-t border-[#1f1f2e] bg-[#0B0B0F] flex items-center justify-between shrink-0">
+          <button type="button" className="text-gray-400 hover:text-white transition-colors px-3 py-2 text-xs font-medium cursor-pointer">
             Save as Draft
           </button>
           
-          <div className="flex gap-3">
-            <button type="button" className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#2d2d3f] bg-[#1a1a24] hover:bg-[#2d2d3f] text-white text-sm font-medium transition-colors cursor-pointer">
-              <Calendar size={16} />
+          <div className="flex gap-2.5">
+            <button type="button" className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#2d2d3f] bg-[#1a1a24] hover:bg-[#2d2d3f] text-white text-xs font-medium transition-colors cursor-pointer">
+              <Calendar size={14} />
               Schedule
             </button>
             <button 
               type="button"
               onClick={handlePublish}
               disabled={!content || selectedPlatforms.length === 0 || isSubmitting}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-indigo-500/20"
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-indigo-500/20"
             >
-              <Send size={16} />
+              <Send size={14} />
               {isSubmitting ? 'Publishing...' : 'Publish Now'}
             </button>
           </div>

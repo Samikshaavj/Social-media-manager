@@ -39,3 +39,89 @@ body {
   scrollbar-color: #2d2d3f transparent;
 }
 
+/* Composer Modal Layout & Guaranteed Scrollability */
+.composer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-height: 700px) {
+  .composer-overlay {
+    justify-content: center;
+  }
+}
+
+.composer-card {
+  background-color: #111116;
+  border: 1px solid #1f1f2e;
+  width: 100%;
+  max-width: 48rem;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem) !important;
+  max-height: calc(100dvh - 2rem) !important;
+  min-height: 0 !important;
+  overflow: hidden;
+  margin: auto 0;
+}
+
+.composer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #1f1f2e;
+  flex-shrink: 0;
+}
+
+.composer-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto !important;
+  flex: 1 1 auto;
+  min-height: 0 !important;
+}
+
+.composer-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #1f1f2e;
+  background-color: #0B0B0F;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.composer-body::-webkit-scrollbar {
+  width: 8px;
+}
+.composer-body::-webkit-scrollbar-track {
+  background: #111116;
+}
+.composer-body::-webkit-scrollbar-thumb {
+  background: #3f3f5a;
+  border-radius: 4px;
+}
+.composer-body::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+.composer-body {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f5a #111116;
+}
+
+
