@@ -80,8 +80,8 @@ const ComposerModal = () => {
       const { data } = await api.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      // Backend should run on localhost:5000 and serve static files
-      const fullUrl = `http://localhost:5000${data.url}`;
+      // Relative URL works on both dev (via Vite proxy) and Render production
+      const fullUrl = data.url;
       setMediaFiles(prev => [...prev, { id: data._id, url: fullUrl, type: data.type }]);
       toast.success('Media uploaded successfully!');
     } catch (error) {
@@ -119,16 +119,16 @@ const ComposerModal = () => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeComposer();
       }}
     >
-      <div className="bg-[#111116] border border-[#1f1f2e] w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] my-auto overflow-hidden">
+      <div className="bg-[#111116] border border-[#1f1f2e] w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[calc(100vh-2rem)] my-auto overflow-hidden">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[#1f1f2e] shrink-0">
-          <h2 className="text-xl font-bold text-white">Create New Post</h2>
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#1f1f2e] shrink-0">
+          <h2 className="text-lg sm:text-xl font-bold text-white">Create New Post</h2>
           <button 
             type="button"
             onClick={closeComposer} 
@@ -140,7 +140,7 @@ const ComposerModal = () => {
         </div>
 
         {/* Content Area */}
-        <div className="p-6 flex flex-col gap-6 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
+        <div className="p-4 sm:p-6 flex flex-col gap-5 sm:gap-6 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
           
           {/* Platform Selector */}
           <div>
@@ -232,7 +232,7 @@ const ComposerModal = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 border-t border-[#1f1f2e] bg-[#0B0B0F] flex items-center justify-between shrink-0">
+        <div className="p-4 sm:p-5 border-t border-[#1f1f2e] bg-[#0B0B0F] flex items-center justify-between shrink-0">
           <button type="button" className="text-gray-400 hover:text-white transition-colors px-4 py-2 text-sm font-medium cursor-pointer">
             Save as Draft
           </button>
