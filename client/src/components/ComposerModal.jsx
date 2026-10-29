@@ -13,7 +13,7 @@ const platformsList = [
 ];
 
 const ComposerModal = () => {
-  const { isComposerOpen, closeComposer, notifyPostCreated } = useComposer();
+  const { isComposerOpen, closeComposer, notifyPostCreated, initialScheduleDate } = useComposer();
   const [content, setContent] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -49,6 +49,11 @@ const ComposerModal = () => {
   useEffect(() => {
     if (!isComposerOpen) return;
 
+    if (initialScheduleDate) {
+      setScheduledDate(initialScheduleDate);
+      setIsScheduling(true);
+    }
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') closeComposer();
     };
@@ -57,7 +62,7 @@ const ComposerModal = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isComposerOpen, closeComposer]);
+  }, [isComposerOpen, closeComposer, initialScheduleDate]);
 
   if (!isComposerOpen) return null;
 
