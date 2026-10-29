@@ -10,11 +10,11 @@ const Landing = () => {
     <div className="min-h-screen bg-white text-[#121028] font-sans overflow-x-hidden selection:bg-[#ffd246] selection:text-[#121028]">
       {/* Navigation Header */}
       <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
           <div className="flex items-end gap-1 h-6">
-            <div className="w-1.5 h-3.5 bg-[#f59e0b] rounded-full"></div>
-            <div className="w-1.5 h-5 bg-[#fbbf24] rounded-full"></div>
-            <div className="w-1.5 h-6 bg-[#f59e0b] rounded-full"></div>
+            <div className="w-1.5 h-3.5 bg-[#5835F5] rounded-full"></div>
+            <div className="w-1.5 h-5 bg-[#5835F5] rounded-full"></div>
+            <div className="w-1.5 h-6 bg-[#5835F5] rounded-full"></div>
           </div>
           <span className="text-2xl font-black text-[#121028] tracking-tight">SocialVibe</span>
         </div>
@@ -45,14 +45,14 @@ const Landing = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Text */}
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 bg-[#f0edff] text-[#5835F5] font-extrabold text-xs px-4 py-1.5 rounded-full">
+            <div className="inline-flex items-center gap-2 bg-[#ede9fe] text-[#5835F5] font-extrabold text-xs px-4 py-1.5 rounded-full">
               <Sparkles size={14} />
               <span>AI that writes in your voice</span>
             </div>
 
             <h1 className="text-5xl sm:text-7xl font-black tracking-tight leading-[1.05] text-[#121028]">
               Post once. <br />
-              Play <span className="bg-[#ffd246] px-2 py-0.5 rounded-xl inline-block">everywhere.</span>
+              Play <span className="bg-[#ffd246] px-3 py-0.5 rounded-2xl inline-block">everywhere.</span>
             </h1>
 
             <p className="text-lg text-gray-600 font-medium max-w-lg leading-relaxed">
@@ -64,57 +64,60 @@ const Landing = () => {
                 onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
                 className="bg-[#121028] hover:bg-black text-white px-8 py-3.5 rounded-full font-bold text-sm transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
               >
-                {isAuthenticated ? 'Go to Dashboard' : 'Get started'}
+                Get started
               </button>
               
-              {!isAuthenticated && (
-                <button
-                  onClick={() => navigate('/login')}
-                  className="border-2 border-[#121028] hover:bg-black/5 text-[#121028] px-8 py-3.5 rounded-full font-bold text-sm transition-all cursor-pointer"
-                >
-                  Sign in
-                </button>
-              )}
+              <a
+                href="#how-it-works"
+                className="border-2 border-[#121028] hover:bg-black/5 text-[#121028] px-8 py-3 rounded-full font-bold text-sm transition-all cursor-pointer text-center"
+              >
+                See how it works
+              </a>
             </div>
           </div>
 
           {/* Right Floating Cards Illustration */}
           <div className="relative min-h-[380px] flex items-center justify-center">
-            {/* Coral/Pink Base Card */}
-            <div className="w-72 h-64 bg-[#ff4b72] rounded-3xl p-5 shadow-2xl transform -rotate-6 relative z-10 text-white flex flex-col justify-between">
+            {/* Purple Base Card with Hot Pink Center */}
+            <div className="w-72 h-64 bg-[#5835F5] rounded-3xl p-5 shadow-2xl transform -rotate-6 relative z-10 text-white flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold opacity-80">@yourbrand</span>
-                <div className="w-8 h-8 rounded-full bg-[#ffd246] opacity-90"></div>
+                <span className="text-xs font-bold opacity-80">@yourname</span>
+                <div className="w-7 h-7 rounded-full bg-[#ffd246]"></div>
               </div>
-              <div className="bg-black/20 p-3 rounded-2xl text-xs font-semibold backdrop-blur-sm">
+              <div className="bg-[#ff4b72] p-4 rounded-2xl text-xs font-bold text-white shadow-md">
                 Weekend sale starts Friday.
+              </div>
+              <div>
+                <span className="bg-white/20 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  Instagram
+                </span>
               </div>
             </div>
 
             {/* White Overlapping Floating Card */}
-            <div className="absolute top-4 right-4 sm:right-12 w-80 bg-white rounded-3xl p-5 shadow-2xl border border-gray-100 transform rotate-3 z-20">
+            <div className="absolute top-4 right-4 sm:right-10 w-80 bg-white rounded-3xl p-5 shadow-2xl border border-gray-100 transform rotate-3 z-20">
               <p className="font-extrabold text-sm text-[#121028] leading-snug mb-2">
                 Three new pieces and one very good reason to visit.
               </p>
               <p className="text-xs text-gray-500 font-medium mb-3">
                 Doors open at 10, and the first ten visitors get a surprise.
               </p>
-              <span className="bg-[#f0edff] text-[#5835F5] font-bold text-[11px] px-3 py-1 rounded-full inline-block">
+              <span className="bg-[#ede9fe] text-[#5835F5] font-bold text-[11px] px-3 py-1 rounded-full inline-block">
                 LinkedIn
               </span>
             </div>
 
             {/* Yellow Floating Pill Card */}
-            <div className="absolute bottom-6 left-6 sm:left-14 bg-[#ffd246] rounded-2xl p-4 shadow-xl z-30 transform -rotate-3 text-[#121028] max-w-[240px]">
-              <p className="font-black text-xs mb-1">Friday, 7 pm. Don't miss it.</p>
-              <span className="bg-[#121028] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                X
+            <div className="absolute bottom-6 left-6 sm:left-12 bg-[#ffd246] rounded-2xl p-4 shadow-xl z-30 transform -rotate-3 text-[#121028] max-w-[240px]">
+              <p className="font-black text-xs mb-1.5">Friday, 7 pm. Don't miss it.</p>
+              <span className="w-5 h-5 bg-[#121028] text-white text-[10px] font-black rounded-full inline-flex items-center justify-center">
+                ✕
               </span>
             </div>
 
             {/* Mint Green Status Pill */}
-            <div className="absolute -bottom-2 right-8 bg-[#10b981] text-white font-extrabold text-xs px-5 py-2 rounded-full shadow-lg z-30 transform rotate-2">
-              Scheduled • Fri 7:00 pm
+            <div className="absolute -bottom-2 right-6 bg-[#10b981] text-white font-extrabold text-xs px-5 py-2 rounded-full shadow-lg z-30 transform rotate-2">
+              Scheduled · Fri 7:00 pm
             </div>
           </div>
         </div>
@@ -122,19 +125,19 @@ const Landing = () => {
 
       {/* Marquee Banner */}
       <div className="bg-[#5835F5] text-white py-4 overflow-hidden whitespace-nowrap shadow-inner">
-        <div className="flex items-center justify-around gap-8 font-black text-lg sm:text-xl tracking-wider uppercase">
+        <div className="flex items-center justify-around gap-6 font-black text-lg sm:text-xl tracking-wider uppercase">
           <span>Schedule</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Create</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Publish</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Repeat</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Schedule</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Create</span>
-          <span className="w-2 h-2 rounded-full bg-white"></span>
+          <span className="text-[#ffd246] text-xl">•</span>
           <span>Publish</span>
         </div>
       </div>
@@ -333,9 +336,9 @@ const Landing = () => {
       <footer className="border-t border-gray-100 py-10 max-w-6xl mx-auto px-6 flex items-center justify-between text-xs text-gray-500 font-semibold">
         <div className="flex items-center gap-2">
           <div className="flex items-end gap-0.5 h-4">
-            <div className="w-1 h-2.5 bg-[#f59e0b] rounded-full"></div>
-            <div className="w-1 h-3.5 bg-[#fbbf24] rounded-full"></div>
-            <div className="w-1 h-4 bg-[#f59e0b] rounded-full"></div>
+            <div className="w-1 h-2.5 bg-[#5835F5] rounded-full"></div>
+            <div className="w-1 h-3.5 bg-[#5835F5] rounded-full"></div>
+            <div className="w-1 h-4 bg-[#5835F5] rounded-full"></div>
           </div>
           <span className="font-bold text-[#121028]">SocialVibe</span>
         </div>

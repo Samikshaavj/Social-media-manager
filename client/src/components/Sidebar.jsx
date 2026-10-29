@@ -21,12 +21,12 @@ const Sidebar = () => {
 
   return (
     <aside className="w-64 h-screen bg-[#0f0e21] border-r border-[#1a1932] flex flex-col fixed left-0 top-0 text-gray-300 z-40 select-none">
-      {/* Brand Logo with 3 Yellow Bars */}
+      {/* Brand Logo with 3 Purple Bars */}
       <div className="p-7 flex items-center gap-3">
         <div className="flex items-end gap-1 h-6">
-          <div className="w-1.5 h-3.5 bg-[#f59e0b] rounded-full"></div>
-          <div className="w-1.5 h-5 bg-[#fbbf24] rounded-full"></div>
-          <div className="w-1.5 h-6 bg-[#f59e0b] rounded-full"></div>
+          <div className="w-1.5 h-3.5 bg-[#5835F5] rounded-full"></div>
+          <div className="w-1.5 h-5 bg-[#5835F5] rounded-full"></div>
+          <div className="w-1.5 h-6 bg-[#5835F5] rounded-full"></div>
         </div>
         <span className="text-2xl font-bold text-white tracking-tight">SocialVibe</span>
       </div>
