@@ -31,6 +31,15 @@ const publicationSchema = new mongoose.Schema({
   externalPostId: {
     type: String, // ID returned from the platform API after successful publish
   },
+  metrics: {
+    views: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
+    comments: { type: Number, default: 0 },
+    shares: { type: Number, default: 0 },
+    impressions: { type: Number, default: 0 },
+    engagementRate: { type: Number, default: 0 },
+    lastFetchedAt: { type: Date }
+  },
   errorDetails: {
     type: String,
   }

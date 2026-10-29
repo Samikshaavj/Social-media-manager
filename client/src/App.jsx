@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
+import Analytics from './pages/Analytics';
 import Posts from './pages/Posts';
 import Calendar from './pages/Calendar';
 import Accounts from './pages/Accounts';
@@ -42,6 +43,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
+              <Route path="analytics" element={<Analytics />} />
               <Route path="posts" element={<Posts />} />
               <Route path="calendar" element={<Calendar />} />
               <Route path="accounts" element={<Accounts />} />

@@ -14,6 +14,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const navItems = [
     { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+    { name: 'Analytics', path: '/analytics', icon: <BarChart3 size={20} /> },
     { name: 'Posts', path: '/posts', icon: <Send size={20} /> },
     { name: 'Calendar', path: '/calendar', icon: <CalendarDays size={20} /> },
     { name: 'Accounts', path: '/accounts', icon: <Users size={20} /> },
